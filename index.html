@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b3cc4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gastos">
+<title>Gastos Tracker</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f5f2fb;--card:#fff;--ink:#21173a;--muted:#716a86;--line:#e6e0f2;--acc:#5b3cc4;--acc2:#ece7fb;--on:#fff;--mango:#f6b92b;--mi:#2a1c00;--danger:#c2410c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#130e22;--card:#1c1530;--ink:#efeaff;--muted:#a197c0;--line:#2d2447;--acc:#9b83f5;--acc2:#2a2150;--on:#140c2e;--danger:#fb923c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#130e22;--card:#1c1530;--ink:#efeaff;--muted:#a197c0;--line:#2d2447;--acc:#9b83f5;--acc2:#2a2150;--on:#140c2e;--danger:#fb923c;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{max-width:520px;margin:0 auto;padding:18px 16px 120px}
+.top{margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.bk{width:42px;height:42px;flex:none;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:20px}
+.warn{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--acc2);border-color:var(--acc);margin:0 0 12px;font-size:14px}
+.warn button{border:0;background:var(--acc);color:var(--on);border-radius:10px;padding:8px 12px;font-weight:600;white-space:nowrap}
+.alt{width:100%;margin-top:10px;border:1px solid var(--acc);background:none;border-radius:14px;padding:14px;font-weight:600;font-size:16px}
+.bnote{color:var(--muted);font-size:14px;margin:8px 0 0}
+.top h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
+.top p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px}
+.tabs button{flex:1;border:0;background:none;color:var(--muted);padding:10px 0;border-radius:10px;font-weight:600}
+.tabs button.on{background:var(--acc);color:var(--on)}
+.nav{display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px}
+.nav button{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:18px}
+.nav b{font-size:17px;font-weight:600}
+.total{background:var(--acc);color:var(--on);border-radius:22px;padding:20px 20px 18px}
+.total .n{font-size:38px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.total .s{margin-top:6px;opacity:.85;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}
+h2{font-size:15px;font-weight:600;color:var(--muted);margin:0 0 12px}
+.chart{display:flex;align-items:stretch;gap:3px;height:130px;padding:14px 12px 8px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+.bar i{display:block;width:70%;margin-top:auto;min-height:3px;background:var(--acc);opacity:.4;border-radius:5px 5px 0 0}
+.bar.today i{background:var(--mango);opacity:1}
+.bar span{height:18px;line-height:18px;font-size:11px;color:var(--muted);white-space:nowrap}
+.cat{display:grid;grid-template-columns:28px 1fr auto;gap:2px 10px;align-items:center;margin-bottom:12px}
+.cat:last-child{margin-bottom:0}
+.cat .e{font-size:20px;grid-row:span 2}
+.cat .v{font-weight:600}
+.cat .t{grid-column:2/4;height:6px;border-radius:3px;background:var(--acc2);overflow:hidden}
+.cat .t i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.gh{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;font-weight:600;margin:14px 0 4px}
+.gh:first-of-type{margin-top:0}
+.it{display:grid;grid-template-columns:34px 1fr auto 32px;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.it .e{font-size:20px;background:var(--acc2);border-radius:10px;width:34px;height:34px;display:grid;place-items:center}
+.it .n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it .n small{display:block;color:var(--muted);font-size:12px}
+.it .v{font-weight:600}
+.it button{width:32px;height:32px;border:0;background:none;color:var(--muted);font-size:16px;border-radius:8px}
+.empty{text-align:center;color:var(--muted);padding:26px 10px}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+.fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:62px;height:62px;border-radius:50%;border:0;background:var(--mango);color:var(--mi);font-size:34px;font-weight:600;line-height:1;box-shadow:0 8px 20px rgba(30,10,80,.35);z-index:3}
+.scrim{position:fixed;inset:0;background:rgba(10,5,30,.5);display:none;z-index:5}
+.open .scrim,.bopen .scrim{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:var(--card);border-radius:24px 24px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));transform:translateY(105%);visibility:hidden;transition:transform .25s,visibility .25s;z-index:6}
+.open #asheet,.bopen #bsheet{transform:none;visibility:visible}
+.sheet h3{margin:0 0 4px;font-size:20px}
+.sheet label{display:block;margin:14px 0 6px;font-size:14px;color:var(--muted);font-weight:600}
+.sheet input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;font-size:16px}
+.sheet #amt{font-size:30px;font-weight:700;letter-spacing:-.02em}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:none;border-radius:999px;padding:8px 12px}
+.chip.on{background:var(--acc2);border-color:var(--acc);font-weight:600}
+.save{width:100%;margin-top:18px;border:0;border-radius:14px;padding:15px;background:var(--acc);color:var(--on);font-weight:700;font-size:17px}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(96px + env(safe-area-inset-bottom,0px));max-width:488px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:14px;padding:12px 14px;display:none;justify-content:space-between;align-items:center;z-index:4}
+.toast.show{display:flex}
+.toast button{border:0;background:none;color:var(--mango);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div><h1>Gastos</h1><p>Bantayan kung saan napupunta ang pera mo.</p></div><button class="bk" data-a="bk" aria-label="Backup ng data">💾</button></div>
+  <div id="view"></div>
+</div>
+<button class="fab" data-a="add" aria-label="Magdagdag ng gastos">+</button>
+<div class="toast" id="toast"><span>Nabura ang gastos</span><button data-a="undo">I-undo</button></div>
+<div class="scrim" data-a="close"></div>
+<div class="sheet" id="asheet" role="dialog" aria-label="Bagong gastos">
+  <h3>Bagong gastos</h3>
+  <label for="amt">Halaga (₱)</label>
+  <input id="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+  <label>Kategorya</label>
+  <div class="chips" id="chips"></div>
+  <label for="note">Tala (optional)</label>
+  <input id="note" type="text" maxlength="60" placeholder="hal. almusal, load, pamasahe">
+  <label for="dt">Petsa</label>
+  <input id="dt" type="date">
+  <button class="save" data-a="save">I-save ang gastos</button>
+</div>
+<div class="sheet" id="bsheet" role="dialog" aria-label="Backup ng data">
+  <h3>Backup ng data</h3>
+  <p class="bnote" id="bstat"></p>
+  <button class="save" data-a="exp">I-save ang backup file</button>
+  <button class="alt" data-a="imp">Ibalik mula sa backup file</button>
+  <input id="imp" type="file" accept=".json,application/json" hidden>
+  <p class="bnote">Piliin ang Files, Google Drive o i-send sa sarili mo para ligtas kahit mabura ang browser data o mawala ang phone.</p>
+  <p class="bnote" id="bmsg" role="status"></p>
+</div>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+var CATS=[["Pagkain","🍚"],["Transport","🚌"],["Bills","💡"],["Pamimili","🛍️"],["Kalusugan","💊"],["Libangan","🎬"],["Iba pa","📦"]];
+var DAYS=["Lin","Lun","Mar","Miy","Huw","Biy","Sab"];
+var MON=["Enero","Pebrero","Marso","Abril","Mayo","Hunyo","Hulyo","Agosto","Setyembre","Oktubre","Nobyembre","Disyembre"];
+var KEY="gastos:v1",S={tab:"day",ref:new Date(),items:[],cat:"Pagkain",undo:null};
+var $=function(s){return document.querySelector(s)};
+var pad=function(n){return String(n).padStart(2,"0")};
+var iso=function(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
+var fromIso=function(s){var p=s.split("-").map(Number);return new Date(p[0],p[1]-1,p[2])};
+var addDays=function(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r};
+var fmt=new Intl.NumberFormat("en-PH",{style:"currency",currency:"PHP"});
+var money=function(n){return fmt.format(n)};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+var emoji=function(c){var f=CATS.filter(function(x){return x[0]===c})[0];return f?f[1]:"📦"};
+var short=function(d){return MON[d.getMonth()].slice(0,3)+" "+d.getDate()};
+
+try{S.items=JSON.parse(localStorage.getItem(KEY))||[]}catch(e){S.items=[]}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S.items))}catch(e){}}
+
+function range(){
+  var r=S.ref;
+  if(S.tab==="day")return[r,r];
+  if(S.tab==="week"){var s=addDays(r,-((r.getDay()+6)%7));return[s,addDays(s,6)]}
+  return[new Date(r.getFullYear(),r.getMonth(),1),new Date(r.getFullYear(),r.getMonth()+1,0)];
+}
+function label(a,b){
+  var t=iso(new Date());
+  if(S.tab==="day")return (iso(a)===t?"Ngayon · ":"")+DAYS[a.getDay()]+", "+short(a);
+  if(S.tab==="week")return short(a)+" – "+(a.getMonth()!==b.getMonth()?short(b):b.getDate());
+  return MON[a.getMonth()]+" "+a.getFullYear();
+}
+function shift(n){
+  var r=S.ref;
+  if(S.tab==="day")S.ref=addDays(r,n);
+  else if(S.tab==="week")S.ref=addDays(r,7*n);
+  else S.ref=new Date(r.getFullYear(),r.getMonth()+n,1);
+  render();
+}
+
+function render(){
+  var rg=range(),a=rg[0],b=rg[1],A=iso(a),B=iso(b),T=iso(new Date()),today=new Date(T+"T00:00");
+  var list=S.items.filter(function(i){return i.d>=A&&i.d<=B}).sort(function(x,y){return y.d.localeCompare(x.d)||y.t-x.t});
+  var total=list.reduce(function(s,i){return s+i.a},0);
+  var days=Math.round((b-a)/864e5)+1;
+  var h=(S.items.length&&Date.now()-lb()>7*864e5?'<div class="card warn"><span>Wala ka pang backup nitong nakaraang 7 araw.</span><button data-a="bk">I-backup</button></div>':'')+'<div class="tabs">'+[["day","Araw-araw"],["week","Lingguhan"],["month","Buwanan"]].map(function(t){return '<button data-a="tab" data-v="'+t[0]+'" class="'+(S.tab===t[0]?"on":"")+'">'+t[1]+'</button>'}).join("")+'</div>';
+  h+='<div class="nav"><button data-a="prev" aria-label="Nakaraan">‹</button><b>'+label(a,b)+'</b><button data-a="next" aria-label="Susunod">›</button></div>';
+
+  var sub=list.length+(list.length===1?" gastos":" na gastos");
+  if(S.tab!=="day"){
+    var end=b<today?b:today,n=a>today?0:Math.round((end-a)/864e5)+1;
+    sub="Average "+money(n?total/n:0)+" kada araw · "+list.length+" gastos";
+  }
+  h+='<div class="total"><div class="n">'+money(total)+'</div><div class="s">'+sub+'</div></div>';
+
+  if(S.tab!=="day"){
+    var by={};list.forEach(function(i){by[i.d]=(by[i.d]||0)+i.a});
+    var bars=[],mx=1,i,d,k;
+    for(i=0;i<days;i++){d=addDays(a,i);k=iso(d);var v=by[k]||0;if(v>mx)mx=v;bars.push({k:k,d:d,v:v})}
+    h+='<div class="card chart">'+bars.map(function(x){
+      var lb=S.tab==="week"?DAYS[x.d.getDay()]:(x.d.getDate()===1||x.d.getDate()%5===0?x.d.getDate():"");
+      return '<div class="bar'+(x.k===T?" today":"")+'"><i style="height:calc((100% - 18px) * '+(x.v/mx).toFixed(3)+')"></i><span>'+lb+'</span></div>';
+    }).join("")+'</div>';
+  }
+
+  if(!list.length){
+    h+='<div class="card empty"><b>Wala pang gastos dito</b>Pindutin ang + para magdagdag.</div>';
+  }else{
+    var cat={};list.forEach(function(i){cat[i.c]=(cat[i.c]||0)+i.a});
+    h+='<div class="card"><h2>Saan napunta ang pera</h2>'+Object.keys(cat).sort(function(x,y){return cat[y]-cat[x]}).map(function(c){
+      return '<div class="cat"><span class="e">'+emoji(c)+'</span><span>'+esc(c)+'</span><span class="v">'+money(cat[c])+'</span><div class="t"><i style="width:'+(cat[c]/total*100).toFixed(1)+'%"></i></div></div>';
+    }).join("")+'</div>';
+
+    h+='<div class="card"><h2>Mga gastos</h2>';
+    var last="";
+    list.forEach(function(it){
+      if(S.tab!=="day"&&it.d!==last){
+        last=it.d;var dd=fromIso(it.d),sum=list.filter(function(z){return z.d===it.d}).reduce(function(s,z){return s+z.a},0);
+        h+='<div class="gh"><span>'+DAYS[dd.getDay()]+", "+short(dd)+'</span><span>'+money(sum)+'</span></div>';
+      }
+      h+='<div class="it"><span class="e">'+emoji(it.c)+'</span><div class="n">'+(it.n?esc(it.n)+'<small>'+esc(it.c)+'</small>':esc(it.c))+'</div><span class="v">'+money(it.a)+'</span><button data-a="del" data-v="'+it.id+'" aria-label="Burahin">✕</button></div>';
+    });
+    h+='</div>';
+  }
+  $("#view").innerHTML=h;
+}
+
+function chips(){
+  $("#chips").innerHTML=CATS.map(function(c){return '<button class="chip'+(S.cat===c[0]?" on":"")+'" data-a="cat" data-v="'+c[0]+'">'+c[1]+" "+c[0]+'</button>'}).join("");
+}
+function openSheet(){
+  $("#amt").value="";$("#note").value="";$("#dt").value=iso(S.tab==="day"?S.ref:new Date());
+  chips();document.body.classList.add("open");
+  setTimeout(function(){$("#amt").focus()},250);
+}
+function closeSheet(){document.body.classList.remove("open","bopen")}
+var tt;
+function toast(){var t=$("#toast");t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},5000)}
+
+var LB="gastos:lastbackup",PERSIST=null;
+function lb(){try{return +localStorage.getItem(LB)||0}catch(e){return 0}}
+function msg(t){$("#bmsg").textContent=t}
+function stat(){var l=lb();$("#bstat").innerHTML="Huling backup: "+(l?new Date(l).toLocaleDateString("fil-PH",{month:"short",day:"numeric",year:"numeric"}):"wala pa")+"<br>Proteksyon ng browser: "+(PERSIST===true?"naka-on ✓":PERSIST===false?"hindi pinayagan ng browser":"sinusuri...")}
+function openB(){msg("");stat();document.body.classList.add("bopen")}
+function backedUp(){try{localStorage.setItem(LB,String(Date.now()))}catch(e){}stat();render();msg("Na-save ang backup ✓")}
+function exportData(){
+  var name="gastos-backup-"+iso(new Date())+".json",blob=new Blob([JSON.stringify({app:"gastos",v:1,items:S.items},null,1)],{type:"application/json"}),f=null;
+  try{f=new File([blob],name,{type:"application/json"})}catch(e){}
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).then(backedUp).catch(function(){})}
+  else{var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();backedUp()}
+}
+$("#imp").addEventListener("change",function(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var j=JSON.parse(r.result),arr=Array.isArray(j)?j:j.items,ids={},add=0;
+      S.items.forEach(function(i){ids[i.id]=1});
+      arr.forEach(function(i){if(i&&i.id&&!ids[i.id]&&+i.a>0&&/^\d{4}-\d{2}-\d{2}$/.test(i.d)){S.items.push({id:i.id,a:+i.a,c:String(i.c||"Iba pa"),n:String(i.n||""),d:i.d,t:i.t||i.id});ids[i.id]=1;add++}});
+      save();render();msg("Naibalik ang "+add+" gastos ✓");
+    }catch(err){msg("Hindi mabasa ang file na ito.")}
+  };
+  r.readAsText(f);e.target.value="";
+});
+try{if(navigator.storage&&navigator.storage.persist){navigator.storage.persisted().then(function(p){return p||navigator.storage.persist()}).then(function(p){PERSIST=p}).catch(function(){})}}catch(e){}
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-a]");if(!t)return;
+  var a=t.dataset.a,v=t.dataset.v;
+  if(a==="tab"){S.tab=v;render()}
+  else if(a==="prev")shift(-1);
+  else if(a==="next")shift(1);
+  else if(a==="add")openSheet();
+  else if(a==="close")closeSheet();
+  else if(a==="bk")openB();
+  else if(a==="exp")exportData();
+  else if(a==="imp")$("#imp").click();
+  else if(a==="cat"){S.cat=v;chips()}
+  else if(a==="save"){
+    var amt=parseFloat($("#amt").value);
+    if(!(amt>0)){$("#amt").focus();return}
+    var d=$("#dt").value||iso(new Date());
+    S.items.push({id:Date.now(),a:Math.round(amt*100)/100,c:S.cat,n:$("#note").value.trim(),d:d,t:Date.now()});
+    save();S.ref=fromIso(d);closeSheet();render();
+  }
+  else if(a==="del"){
+    var idx=S.items.findIndex(function(i){return String(i.id)===v});
+    if(idx>-1){S.undo=S.items.splice(idx,1)[0];save();render();toast()}
+  }
+  else if(a==="undo"){
+    if(S.undo){S.items.push(S.undo);S.undo=null;save();render()}
+    $("#toast").classList.remove("show");
+  }
+});
+render();
+</script>
+</body>
+</html>

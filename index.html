@@ -29,6 +29,8 @@ button{cursor:pointer}
 .warn button{border:0;background:var(--acc);color:var(--on);border-radius:10px;padding:8px 12px;font-weight:600;white-space:nowrap}
 .alt{width:100%;margin-top:10px;border:1px solid var(--acc);background:none;border-radius:14px;padding:14px;font-weight:600;font-size:16px}
 .bnote{color:var(--muted);font-size:14px;margin:8px 0 0}
+.sheet{max-height:92vh;overflow-y:auto}
+#bmsg{font-weight:600;color:var(--acc);min-height:1.4em}
 .top h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
 .top p{margin:2px 0 0;color:var(--muted);font-size:14px}
 .tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px}
@@ -105,11 +107,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 <div class="sheet" id="bsheet" role="dialog" aria-label="Backup ng data">
   <h3>Backup ng data</h3>
   <p class="bnote" id="bstat"></p>
-  <button class="save" data-a="exp">I-save ang backup file</button>
+  <p class="bnote" id="bmsg" role="status"></p>
+  <button class="save" data-a="exp">I-save sa phone (Downloads)</button>
+  <button class="alt" data-a="shr">I-share (Drive, Messenger, email)</button>
   <button class="alt" data-a="imp">Ibalik mula sa backup file</button>
   <input id="imp" type="file" accept=".json,application/json" hidden>
-  <p class="bnote">Piliin ang Files, Google Drive o i-send sa sarili mo para ligtas kahit mabura ang browser data o mawala ang phone.</p>
-  <p class="bnote" id="bmsg" role="status"></p>
+  <p class="bnote">Mase-save ang backup sa Downloads folder ng phone mo. Ilipat ito sa Google Drive o i-send sa sarili mo para ligtas kahit mawala ang phone.</p>
 </div>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
@@ -215,12 +218,21 @@ function lb(){try{return +localStorage.getItem(LB)||0}catch(e){return 0}}
 function msg(t){$("#bmsg").textContent=t}
 function stat(){var l=lb();$("#bstat").innerHTML="Huling backup: "+(l?new Date(l).toLocaleDateString("fil-PH",{month:"short",day:"numeric",year:"numeric"}):"wala pa")+"<br>Proteksyon ng browser: "+(PERSIST===true?"naka-on ✓":PERSIST===false?"hindi pinayagan ng browser":"sinusuri...")}
 function openB(){msg("");stat();document.body.classList.add("bopen")}
-function backedUp(){try{localStorage.setItem(LB,String(Date.now()))}catch(e){}stat();render();msg("Na-save ang backup ✓")}
+function backedUp(t){try{localStorage.setItem(LB,String(Date.now()))}catch(e){}stat();render();msg(t||"Na-save ang backup ✓")}
+function backupFile(){return{name:"gastos-backup-"+iso(new Date())+".json",blob:new Blob([JSON.stringify({app:"gastos",v:1,items:S.items},null,1)],{type:"application/json"})}}
 function exportData(){
-  var name="gastos-backup-"+iso(new Date())+".json",blob=new Blob([JSON.stringify({app:"gastos",v:1,items:S.items},null,1)],{type:"application/json"}),f=null;
-  try{f=new File([blob],name,{type:"application/json"})}catch(e){}
-  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).then(backedUp).catch(function(){})}
-  else{var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();backedUp()}
+  var b=backupFile();msg("Ginagawa ang backup...");
+  try{
+    var a=document.createElement("a");a.href=URL.createObjectURL(b.blob);a.download=b.name;a.style.display="none";document.body.appendChild(a);a.click();
+    setTimeout(function(){a.remove();URL.revokeObjectURL(a.href)},4000);
+    backedUp("Na-save sa Downloads: "+b.name+" ✓");
+  }catch(err){msg("Hindi na-save ("+err.name+"). Subukan ang I-share.")}
+}
+function shareData(){
+  var b=backupFile(),f=null;msg("Binubuksan ang share...");
+  try{f=new File([b.blob],b.name,{type:"application/json"})}catch(e){}
+  if(!(f&&navigator.canShare&&navigator.canShare({files:[f]}))){msg("Hindi suportado ang share dito. Gamitin ang I-save sa phone.");return}
+  navigator.share({files:[f],title:b.name}).then(function(){backedUp("Naipadala ang backup ✓")}).catch(function(err){msg(err&&err.name==="AbortError"?"Kinansela.":"Hindi gumana ang share ("+(err&&err.name)+"). Gamitin ang I-save sa phone.")});
 }
 $("#imp").addEventListener("change",function(e){
   var f=e.target.files[0];if(!f)return;
@@ -246,6 +258,7 @@ document.addEventListener("click",function(e){
   else if(a==="close")closeSheet();
   else if(a==="bk")openB();
   else if(a==="exp")exportData();
+  else if(a==="shr")shareData();
   else if(a==="imp")$("#imp").click();
   else if(a==="cat"){S.cat=v;chips()}
   else if(a==="save"){
